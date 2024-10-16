@@ -4,13 +4,13 @@
  * Plugin URI: https://www.tychesoftwares.com/store/premium-plugins/order-delivery-date-for-woocommerce-pro-21/
  * Description: This plugin allows customers to choose their preferred Order Delivery Date during checkout.
  * Author: Tyche Softwares
- * Version: 3.22.0
+ * Version: 3.23.0
  * Author URI: https://www.tychesoftwares.com/
  * Contributor: Tyche Softwares, https://www.tychesoftwares.com/
  * Text Domain: order-delivery-date
  * Requires PHP: 7.3
  * WC requires at least: 3.0.0
- * WC tested up to: 9.1.4
+ * WC tested up to: 9.3.3
  *
  * @package  Order-Delivery-Date-Lite-for-WooCommerce
  */
@@ -20,7 +20,7 @@
  *
  * @since 1.0
  */
-$wpefield_version = '3.22.0';
+$wpefield_version = '3.23.0';
 
 /**
  * Template path.
@@ -93,8 +93,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'order_lite_holidays_admin_settings' ) );
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_lite_delete_settings' ) );
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_lite_calendar_sync_settings_callback' ) );
-			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_delivery_days_settings' ) );
-			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_time_settings' ) );
+
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_integration_of_plugins' ) );
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_lite_time_slot_settings' ) );
 			add_action( 'admin_init', array( 'Orddd_Lite_Settings', 'orddd_lite_disable_time_slot_settings' ) );
@@ -334,7 +333,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 		 */
 		public function orddd_lite_update_db_check() {
 			global $wpefield_version;
-			if ( '3.22.0' === $wpefield_version ) {
+			if ( '3.23.0' === $wpefield_version ) {
 				self::orddd_lite_update_install();
 			}
 		}
@@ -440,6 +439,15 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 				wp_enqueue_script( 'orddd-lite-timepicker', plugins_url( '/js/jquery.timepicker.min.js', __FILE__ ), array( 'jquery' ), $wpefield_version, true );
 				wp_enqueue_script( 'orddd-lite-timesetting', plugins_url( '/js/orddd-bulk-time-slots.js', __FILE__ ), array( 'jquery', 'orddd-lite-timepicker' ), $wpefield_version, true );
 				wp_localize_script( 'orddd-lite-timesetting', 'jsL10n', $js_args );
+			}
+
+			if ( isset( $_GET['action'] ) && in_array( $_GET['action'], array( 'calendar_sync_settings', 'shipping_based', 'upgrade_to_pro_page' ), true ) ) { //phpcs:ignore
+				wp_enqueue_style(
+					'orddd-theme-style',
+					plugins_url( '/css/theme-style.css', __FILE__ ),
+					array(),
+					$wpefield_version
+				);
 			}
 		}
 
