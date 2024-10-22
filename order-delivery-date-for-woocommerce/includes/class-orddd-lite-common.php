@@ -403,7 +403,7 @@ class Orddd_Lite_Common {
 			if ( ! $post_obj ) {
 				return;
 			}
-			$post_status = $post_status->post_status;
+			$post_status = $post_obj->post_status;
 			$post_type   = $post_obj->post_type;
 		}
 
@@ -1531,7 +1531,7 @@ class Orddd_Lite_Common {
 			$post_type   = $order->get_type();
 		} else {
 			$post_obj    = get_post( $order_id );
-			$post_status = $post_status->post_status;
+			$post_status = $post_obj->post_status;
 			$post_type   = $post_obj->post_type;
 		}
 		$status = array( 'wc-pending', 'wc-cancelled', 'wc-refunded', 'wc-failed' );
@@ -1810,6 +1810,12 @@ class Orddd_Lite_Common {
 			}
 			$orddd_lite_settings['orddd_lite_disable_for_holidays']       = $orddd_lite_disable_for_holidays;
 			$orddd_lite_settings['orddd_lite_delivery_date_on_cart_page'] = get_option( 'orddd_lite_delivery_date_on_cart_page' );
+			$orddd_lite_settings['orddd_is_cart_block']                   = has_block( 'woocommerce/checkout' ) || has_block( 'woocommerce/cart' );
+			if ( class_exists( 'FluidCheckout' ) ) {
+				if ( FluidCheckout_Steps::instance() ) {
+					$orddd_lite_settings['orddd_is_cart_block'] = false;
+				}
+			}
 
 			$current_hour   = gmdate( 'H', $current_time );
 			$current_minute = gmdate( 'i', $current_time );
@@ -1822,7 +1828,6 @@ class Orddd_Lite_Common {
 			$orddd_lite_settings['orddd_min_date_set']                                 = $min_date_array['min_date'];
 			$orddd_lite_settings['orddd_is_cart']                                      = is_cart();
 			$orddd_lite_settings['orddd_lite_auto_populate_first_available_time_slot'] = get_option( 'orddd_lite_auto_populate_first_available_time_slot' );
-			$orddd_lite_settings['orddd_is_cart_block']                                = has_block( 'woocommerce/checkout' ) || has_block( 'woocommerce/cart' );
 			$orddd_lite_settings['is_enable_delivery_date']                            = 'on' === get_option( 'orddd_lite_enable_delivery_date' ) ? true : false;
 			$orddd_lite_settings['orddd_lite_time_slot_mandatory']                     = get_option( 'orddd_lite_time_slot_mandatory' );
 			$orddd_lite_settings['orddd_lite_delivery_date_field_label']               = get_option( 'orddd_lite_delivery_date_field_label' );

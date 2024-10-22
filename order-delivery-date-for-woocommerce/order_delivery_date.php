@@ -4,13 +4,14 @@
  * Plugin URI: https://www.tychesoftwares.com/store/premium-plugins/order-delivery-date-for-woocommerce-pro-21/
  * Description: This plugin allows customers to choose their preferred Order Delivery Date during checkout.
  * Author: Tyche Softwares
- * Version: 3.23.0
+ * Version: 3.24.0
  * Author URI: https://www.tychesoftwares.com/
  * Contributor: Tyche Softwares, https://www.tychesoftwares.com/
  * Text Domain: order-delivery-date
  * Requires PHP: 7.3
  * WC requires at least: 3.0.0
  * WC tested up to: 9.3.3
+ * Requires Plugins: woocommerce
  *
  * @package  Order-Delivery-Date-Lite-for-WooCommerce
  */
@@ -20,7 +21,7 @@
  *
  * @since 1.0
  */
-$wpefield_version = '3.23.0';
+$wpefield_version = '3.24.0';
 
 /**
  * Template path.
@@ -176,7 +177,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 			add_action( 'woocommerce_cart_calculate_fees', array( 'Orddd_Lite_Process', 'orddd_lite_add_delivery_date_fee' ) );
 
 			// Ajax calls.
-			add_action( 'init', array( &$this, 'orddd_lite_add_component_file' ) );
+			add_action( 'admin_init', array( &$this, 'orddd_lite_add_component_file' ) );
 
 			// It will add the actions for the components.
 			if ( is_admin() ) {
@@ -263,6 +264,11 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 			} else {
 				load_plugin_textdomain( $domain, false, basename( dirname( __FILE__ ) ) . '/languages/' );
 			}
+			if ( class_exists( 'FluidCheckout' ) ) {
+				$fluid_checkout_steps = FluidCheckout_Steps::instance();
+				remove_filter( 'woocommerce_update_order_review_fragments', array( $fluid_checkout_steps, 'add_shipping_methods_text_fragment' ), 10 );
+				remove_filter( 'woocommerce_update_order_review_fragments', array( $fluid_checkout_steps, 'add_checkout_billing_address_fields_fragment' ), 10 );
+			}
 		}
 
 		/**
@@ -333,7 +339,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 		 */
 		public function orddd_lite_update_db_check() {
 			global $wpefield_version;
-			if ( '3.23.0' === $wpefield_version ) {
+			if ( '3.24.0' === $wpefield_version ) {
 				self::orddd_lite_update_install();
 			}
 		}
@@ -549,17 +555,19 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 			if ( is_admin() ) {
 				global $wpefield_version;
 				require_once 'includes/orddd-lite-component.php';
-				require_once 'includes/component/plugin-deactivation/class-tyche-plugin-deactivation.php';
-				new Tyche_Plugin_Deactivation(
-					array(
-						'plugin_name'       => 'Order Delivery Date for WooCommerce (Lite version)',
-						'plugin_base'       => 'order-delivery-date-for-woocommerce/order_delivery_date.php',
-						'script_file'       => plugins_url( '/js/plugin-deactivation.js', __FILE__ ),
-						'plugin_short_name' => 'orddd_lite',
-						'version'           => $wpefield_version,
-						'plugin_locale'     => 'order-delivery-date',
-					)
-				);
+				if ( strpos( $_SERVER['REQUEST_URI'], 'plugins.php' ) !== false || strpos( $_SERVER['REQUEST_URI'], 'action=deactivate' ) !== false || ( strpos( $_SERVER['REQUEST_URI'], 'admin-ajax.php' ) !== false && isset( $_POST['action'] ) && $_POST['action'] === 'tyche_plugin_deactivation_submit_action' ) ) { //phpcs:ignore
+					require_once 'includes/component/plugin-deactivation/class-tyche-plugin-deactivation.php';
+					new Tyche_Plugin_Deactivation(
+						array(
+							'plugin_name'       => 'Order Delivery Date for WooCommerce (Lite version)',
+							'plugin_base'       => 'order-delivery-date-for-woocommerce/order_delivery_date.php',
+							'script_file'       => plugins_url( '/js/plugin-deactivation.js', __FILE__ ),
+							'plugin_short_name' => 'orddd_lite',
+							'version'           => $wpefield_version,
+							'plugin_locale'     => 'order-delivery-date',
+						)
+					);
+				}
 				require_once 'includes/component/plugin-tracking/class-tyche-plugin-tracking.php';
 				new Tyche_Plugin_Tracking(
 					array(
