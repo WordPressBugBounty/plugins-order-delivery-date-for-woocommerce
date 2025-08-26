@@ -4,13 +4,13 @@
  * Plugin URI: https://www.tychesoftwares.com/store/premium-plugins/order-delivery-date-for-woocommerce-pro-21/
  * Description: This plugin allows customers to choose their preferred Order Delivery Date during checkout.
  * Author: Tyche Softwares
- * Version: 4.1.0
+ * Version: 4.2.0
  * Author URI: https://www.tychesoftwares.com/
  * Contributor: Tyche Softwares, https://www.tychesoftwares.com/
  * Text Domain: order-delivery-date
  * Requires PHP: 7.3
  * WC requires at least: 3.0.0
- * WC tested up to: 9.9.5
+ * WC tested up to: 10.1.1
  * Requires Plugins: woocommerce
  *
  * @package  Order-Delivery-Date-Lite-for-WooCommerce
@@ -21,7 +21,7 @@
  *
  * @since 1.0
  */
-$wpefield_version = '4.1.0';
+$wpefield_version = '4.2.0';
 
 /**
  * Template path.
@@ -331,7 +331,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 		 */
 		public function orddd_lite_update_db_check() {
 			global $wpefield_version;
-			if ( '4.1.0' === $wpefield_version ) {
+			if ( '4.2.0' === $wpefield_version ) {
 				self::orddd_lite_update_install();
 			}
 		}
@@ -622,7 +622,7 @@ if ( ! class_exists( 'order_delivery_date_lite' ) ) {
 					}
 				}
 
-				if ( ( ( is_cart() || has_block( 'woocommerce/cart' ) ) && 'on' === get_option('orddd_lite_delivery_date_on_cart_page' ) ) || is_checkout() || has_block( 'woocommerce/checkout' ) ) {
+				if ( ( ( is_cart() || has_block( 'woocommerce/cart' ) ) && 'on' === get_option('orddd_lite_delivery_date_on_cart_page' ) ) || is_checkout() || has_block( 'woocommerce/checkout' ) || ( function_exists( 'icl_object_id' ) && is_page( icl_object_id( wc_get_page_id( 'checkout' ), 'page', true ) ) ) ) {
 					wp_enqueue_script( $language_selected, plugins_url( "/js/i18n/jquery.ui.datepicker-$language_selected.js", __FILE__ ), array( 'jquery', 'jquery-ui-datepicker' ), $wpefield_version, false );
 					wp_enqueue_script( 'initialize-datepicker-orddd', plugins_url( '/js/orddd-lite-initialize-datepicker.js', __FILE__ ), '', $wpefield_version, false );
 				}
