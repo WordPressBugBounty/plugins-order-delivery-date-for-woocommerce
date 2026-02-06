@@ -52,6 +52,10 @@ const Block = ({ children, checkoutExtensionData }) => {
 		setIsLoading( load );
 	}
 
+	if ( 'yes' !== orddd_lite_params.orddd_lite_is_delivery_enabled ) {
+		return null;
+	}
+
     return (
 		<LoadingMask
 			isLoading={ isLoading }

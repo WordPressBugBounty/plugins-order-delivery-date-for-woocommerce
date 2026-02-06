@@ -20,7 +20,7 @@ class Order_DeliveryDate_Lite_Blocks_Integration implements IntegrationInterface
 	 * @return string
 	 */
 	public function get_name() {
-		return 'delivery-date';
+		return 'delivery_date';
 	}
 
 	/**
@@ -70,6 +70,17 @@ class Order_DeliveryDate_Lite_Blocks_Integration implements IntegrationInterface
 			$time_slot_enabled = true;
 		}
 
+		$wc_pickup_locations  = $this->get_wc_pickup_locations();
+		$wc_enabled_locations = array();
+		foreach ( $wc_pickup_locations as $key => $value ) {
+			if ( ( isset( $value['enabled'] ) && false === $value['enabled'] ) ) {
+				continue;
+			}
+			$wc_enabled_locations[] = $value;
+		}
+
+		$wc_pickup_locations = is_array( $wc_enabled_locations ) && count( $wc_enabled_locations ) > 0 ? true : false;
+
 		$data = array(
 			'dateLabel'           => $date_field_label,
 			'checkout'            => '',
@@ -78,6 +89,7 @@ class Order_DeliveryDate_Lite_Blocks_Integration implements IntegrationInterface
 			'timeLabel'           => $time_field_label,
 			'time_slot_options'   => $time_slot_options,
 			'validate_time_field' => $validate_time_field,
+			'wc_pickup_locations' => $wc_pickup_locations,
 		);
 		return $data;
 	}
@@ -137,7 +149,27 @@ class Order_DeliveryDate_Lite_Blocks_Integration implements IntegrationInterface
 			'delivery-date-block-frontend',
 			$style_url,
 			array(),
-			time()
+			$script_asset['version'],
+			true
+		);
+
+		// Check if Order Delivery Date block is present on the checkout page.
+		$page_id = wc_get_page_id( 'checkout' );
+		$post    = get_post( $page_id );
+
+		$is_orddd_block_present = false;
+		if ( $post ) {
+			if ( has_block( 'order-delivery-date/delivery-date', $post->post_content ) ) {
+				$is_orddd_block_present = true;
+			}
+		}
+
+		wp_localize_script(
+			'delivery-date-block-frontend',
+			'orddd_block_params',
+			array(
+				'is_orddd_block_present' => $is_orddd_block_present,
+			)
 		);
 	}
 
@@ -152,5 +184,22 @@ class Order_DeliveryDate_Lite_Blocks_Integration implements IntegrationInterface
 			return filemtime( $file );
 		}
 		return ORDD_LITE_BLOCK_VERSION;
+	}
+	/**
+	 * Fetch the wc pickup locations when local pickup option is enabled.
+	 *
+	 * @return array
+	 */
+	public function get_wc_pickup_locations() {
+		$get_all_wc_pickup_locations = ( false !== get_option( 'pickup_location_pickup_locations' ) && '' !== get_option( 'pickup_location_pickup_locations' ) ) ? get_option( 'pickup_location_pickup_locations' ) : array();
+		$wc_pickup_locations         = array();
+		foreach ( $get_all_wc_pickup_locations as $key => $value ) {
+			if ( isset($value['address'] ) && is_array( $value['address'] ) ) { //phpcs:ignore
+				$value = array_merge( $value, $value['address'] );
+				unset( $value['address'] );
+			}
+			$wc_pickup_locations[] = $value;
+		}
+		return $wc_pickup_locations;
 	}
 }

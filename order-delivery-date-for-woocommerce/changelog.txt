@@ -1,4 +1,23 @@
 *** Order Delivery Date for WooCommerce ***
+2026-01-13 - version 4.4.0
+* Enhancement – Added a Delivery Calendar view in the backend to review and manage delivery dates for received orders.
+* Tweak - Ability to add Order Delivery Date block in any section on the checkout block page.
+* Fix - The “Disable Delivery Date and Time Slot Fields for Virtual Products” option was incorrectly hiding the fields for all products.
+* Fix - The selected delivery time slot was not retained on the Block Checkout page.
+
+2025-12-19 - version 4.3.2
+* Fix - Resolved a security issue where unauthenticated requests could trigger deletion of block time slots & holidays in the Order Delivery Date settings.
+
+2025-11-19 - version 4.3.1
+* Fix - Resolved a security issue where unauthenticated requests could trigger deletion of time slots in the Order Delivery Date settings.
+
+2025-11-12 - version 4.3.0
+* Fix – Resolved jQuery(...).datepicker error occurring on Shop, Product, and Cart pages.
+* Fix – The Delivery Date field did not appear on the WooCommerce Checkout Block when “Force shipping to the customer billing address” was enabled under WooCommerce → Settings → Shipping.
+* Fix – Addressed CSS warnings displayed in Firefox.
+* Fix – Delivery Date and Time Slot fields were appearing for Virtual Products even when the “Disable Delivery Date and Time Slot fields for Virtual Products” setting was enabled.
+* Fix – Prevent PHP deprecated warnings from appearing in the debug log.
+
 2025-08-26 - version 4.2.0
 * Fix – Time slot charges were not appearing on the Checkout block page.
 * Fix – Broken Access Control vulnerability in versions ≤ 4.1.0.

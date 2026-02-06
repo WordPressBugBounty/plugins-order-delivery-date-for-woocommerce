@@ -274,7 +274,7 @@ class Orddd_Lite_Settings {
 			array( 'Orddd_Lite_Appearance_Settings', 'orddd_lite_delivery_date_in_shipping_section_callback' ),
 			'orddd_lite_appearance_page',
 			'orddd_lite_appearance_section',
-			array( __( '</br>The Delivery Date field will be displayed in the selected section.</br><i>Note: WooCommerce automatically hides the Shipping section fields for Virtual products.</i>', 'order-delivery-date' ) )
+			array( __( '</br>The Delivery Date field will be displayed in the selected section.</br><i>Note: WooCommerce automatically hides the Shipping section fields for Virtual products.</i></br><i>Note: In Checkout Block, please add the Order Delivery Date block manually from the Edit Checkout page in any preferred section.</i>', 'order-delivery-date' ) )
 		);
 
 		add_settings_field(
@@ -1087,6 +1087,7 @@ class Orddd_Lite_Settings {
 		$active_shipping_based   = '';
 		$calendar_sync_settings  = '';
 		$active_general_settings = '';
+		$active_delivery_calendar = '';
 
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( isset( $_GET['action'] ) ) {
@@ -1104,6 +1105,10 @@ class Orddd_Lite_Settings {
 			$active_shipping_based = 'nav-tab-active';
 		}
 
+		if ( 'delivery_calendar' === $action ) {
+			$active_delivery_calendar = 'nav-tab-active';
+		}
+
 		if ( 'calendar_sync_settings' === $action ) {
 			$calendar_sync_settings = 'nav-tab-active';
 		}
@@ -1116,6 +1121,7 @@ class Orddd_Lite_Settings {
 		<div class="wrap woocommerce">
 			<nav class="nav-tab-wrapper woo-nav-tab-wrapper" id="orddd_settings_tabs">
 				<a href="admin.php?page=order_delivery_date_lite&action=general_settings" class="nav-tab <?php echo esc_attr( $active_general_settings ); ?>"><?php esc_attr_e( 'General Settings', 'order-delivery-date' ); ?> </a>
+				<a href="admin.php?page=order_delivery_date_lite&action=delivery_calendar" class="nav-tab <?php echo esc_attr( $active_delivery_calendar ); ?>"> <?php esc_attr_e( 'Delivery Calendar', 'order-delivery-date' ); ?> </a>
 				<?php if ( 'yes' === get_option( 'orddd_pro_installed', '' ) ) : ?>
 				<a href="admin.php?page=order_delivery_date_lite&action=shipping_based" class="nav-tab <?php echo esc_attr( $active_shipping_based ); ?>"> <?php esc_attr_e( 'Delivery Schedules', 'order-delivery-date' ); ?> </a>
 				<a href="admin.php?page=order_delivery_date_lite&action=calendar_sync_settings" class="nav-tab <?php echo esc_attr( $calendar_sync_settings ); ?>"> <?php esc_attr_e( 'Integrations', 'order-delivery-date' ); ?></a>
@@ -1304,7 +1310,7 @@ class Orddd_Lite_Settings {
 								submit_button( __( 'Save Settings', 'order-delivery-date' ), 'primary', 'save', true );
 							print( '</form>
 						</div>' );
-						echo "<h3 id='block_timeslot_table_head'>" . esc_attr_e( 'Blocked Time Slots', 'order-delivery-date' ) . '</h3>';
+						echo "<h3 id='block_timeslot_table_head'>" . esc_html__( 'Blocked Time Slots', 'order-delivery-date' ) . '</h3>';
 						include_once 'class-orddd-lite-view-disable-time-slots.php';
 						$orddd_table_test = new ORDDD_Lite_View_Disable_Time_Slots();
 						$orddd_table_test->orddd_prepare_items();
@@ -1379,6 +1385,15 @@ class Orddd_Lite_Settings {
 				ORDDD_LITE_TEMPLATE_PATH
 			);
 			echo ob_get_clean();
+		} elseif ( 'delivery_calendar' === $action ) {
+			ob_start();
+			wc_get_template(
+				'orddd-lite-delivery-calendar-html.php',
+				array(),
+				'order-delivery-date-for-woocommerce',
+				ORDDD_LITE_TEMPLATE_PATH
+			);
+			echo ob_get_clean();
 		}
 	}
 
@@ -1391,6 +1406,13 @@ class Orddd_Lite_Settings {
 
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( ( isset( $_GET['page'] ) && 'order_delivery_date_lite' === $_GET['page'] ) && ( isset( $_GET['tab'] ) && 'general_settings' === $_GET['tab'] && ( isset( $_GET['section'] ) && sanitize_text_field( $_GET['section'] ) == 'holidays' ) ) && ( ( isset( $_GET['action'] ) && 'orddd_lite_delete' === $_GET['action'] ) || ( isset( $_GET['action2'] ) && 'orddd_lite_delete' === $_GET['action2'] ) ) ) { //phpcs:ignore
+
+			if ( ! is_admin() || ! current_user_can( 'manage_woocommerce' ) ) {
+					return;
+			}
+			if ( ! isset( $_GET['orddd_lite_holidays_nonce'] ) || ! wp_verify_nonce( $_GET['orddd_lite_holidays_nonce'], 'orddd_lite_holidays_nonce' ) ) { //phpcs:ignore
+				wp_die( 'Security check failed (invalid nonce).' );
+			}
 
 			$holiday = array();
 			// phpcs:ignore WordPress.Security.NonceVerification
@@ -1416,6 +1438,13 @@ class Orddd_Lite_Settings {
 		if ( ( isset( $_POST['page'] ) && sanitize_text_field( $_POST['page'] ) == 'order_delivery_date_lite' ) && ( isset( $_POST['tab'] ) && sanitize_text_field( $_POST['tab'] ) == 'general_settings' ) && ( isset( $_POST['section'] ) && sanitize_text_field( $_POST['section'] ) == 'time_slot' ) ) { //phpcs:ignore
 
 			if ( ( isset( $_POST['action'] ) && sanitize_text_field( $_POST['action'] ) == 'orddd_delete' ) || ( isset( $_POST['action2'] ) && sanitize_text_field( $_POST['action2'] ) == 'orddd_delete' ) ) { //phpcs:ignore
+
+				if ( ! is_admin() || ! current_user_can( 'manage_woocommerce' ) ) {
+					return;
+				}
+				if ( ! isset( $_POST['orddd_bulk_delete_nonce'] ) || ! wp_verify_nonce( $_POST['orddd_bulk_delete_nonce'], 'orddd_bulk_delete_action' ) ) { //phpcs:ignore
+					wp_die( 'Security check failed (invalid nonce).' );
+				}
 
 				$time_slot_to_delete = array();
 				if ( isset( $_POST['time_slot'] ) ) { //phpcs:ignore
@@ -1515,6 +1544,13 @@ class Orddd_Lite_Settings {
 		if ( ( isset( $_POST['page'] ) && sanitize_text_field( $_POST['page'] ) == 'order_delivery_date_lite' ) && ( isset( $_POST['tab'] ) && sanitize_text_field( $_POST['tab'] ) == 'general_settings' ) && ( isset( $_POST['section'] ) && sanitize_text_field( $_POST['section'] ) == 'block_time_slot_settings' ) ) { //phpcs:ignore
 
 			if ( ( isset( $_POST['action'] ) && sanitize_text_field( $_POST['action'] ) == 'orddd_delete' ) || ( isset( $_POST['action2'] ) && sanitize_text_field( $_POST['action2'] ) == 'orddd_delete' ) ) { //phpcs:ignore
+
+				if ( ! is_admin() || ! current_user_can( 'manage_woocommerce' ) ) {
+					return;
+				}
+				if ( ! isset( $_POST['orddd_block_time_slot_nonce'] ) || ! wp_verify_nonce( $_POST['orddd_block_time_slot_nonce'], 'orddd_block_time_slot_nonce' ) ) { //phpcs:ignore
+					wp_die( 'Security check failed (invalid nonce).' );
+				}
 				$block_time_slot_to_delete = array();
 				if ( isset( $_POST['block_time_slot'] ) ) { //phpcs:ignore
 					$block_time_slot_to_delete = $_POST['block_time_slot']; //phpcs:ignore

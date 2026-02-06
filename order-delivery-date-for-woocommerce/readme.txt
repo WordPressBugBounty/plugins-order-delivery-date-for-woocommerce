@@ -4,8 +4,8 @@ Donate link: https://www.paypal.me/TycheSoftwares
 Author URI: https://www.tychesoftwares.com/
 Tags: delivery date, delivery time, preparation time, woocommerce, pickup date
 Requires at least: 1.3
-Tested up to: 6.8.2
-Stable tag: 4.2.0
+Tested up to: 6.9
+Stable tag: 4.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -69,6 +69,7 @@ Here are the Order Delivery Date for WooCommerce lite features:
 * Admin can edit delivery dates from Orders page & notify the customer.
 * Selected Delivery Date will be displayed on the WooCommerce Order page at the backend.
 * The selected delivery date will be displayed on the WooCommerce Edit Order page in the admin dashboard.
+* View delivery dates of received orders in a calendar inside the admin dashboard, making it easier to review delivery schedules in one place.
 * Admins can filter orders based on the delivery dates on the WooCommerce orders page.
 * Compatible with WooCommerce HPOS.
 
@@ -180,6 +181,25 @@ Option 3:
 This plugin communicates with our tracking server to send usage data **only** if the user has explicitly opted in to usage tracking. For detailed information about what is tracked, please refer to our [usage tracking documentation](https://www.tychesoftwares.com/docs/woocommerce-order-delivery-date-lite/order-delivery-lite-usage-tracking/).
 
 == Changelog ==
+
+= 4.4.0 (13.01.2026)
+* Enhancement – Added a Delivery Calendar view in the backend to review and manage delivery dates for received orders.
+* Tweak - Ability to add Order Delivery Date block in any section on the checkout block page.
+* Fix - The “Disable Delivery Date and Time Slot Fields for Virtual Products” option was incorrectly hiding the fields for all products.
+* Fix - The selected delivery time slot was not retained on the Block Checkout page.
+
+= 4.3.2 (19.12.2025)
+* Fix - Resolved a security issue where unauthenticated requests could trigger deletion of block time slots & holidays in the Order Delivery Date settings.
+
+= 4.3.1 (19.11.2025)
+* Fix - Resolved a security issue where unauthenticated requests could trigger deletion of time slots in the Order Delivery Date settings.
+
+= 4.3.0 (12.11.2025)
+* Fix – Resolved jQuery(...).datepicker error occurring on Shop, Product, and Cart pages.
+* Fix – The Delivery Date field did not appear on the WooCommerce Checkout Block when “Force shipping to the customer billing address” was enabled under WooCommerce → Settings → Shipping.
+* Fix – Addressed CSS warnings displayed in Firefox.
+* Fix – Delivery Date and Time Slot fields were appearing for Virtual Products even when the “Disable Delivery Date and Time Slot fields for Virtual Products” setting was enabled.
+* Fix – Prevent PHP deprecated warnings from appearing in the debug log.
 
 = 4.2.0 (26.08.2025)
 * Fix – Time slot charges were not appearing on the Checkout block page.
